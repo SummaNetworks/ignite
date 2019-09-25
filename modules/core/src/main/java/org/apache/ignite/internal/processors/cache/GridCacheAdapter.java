@@ -17,6 +17,11 @@
 
 package org.apache.ignite.internal.processors.cache;
 
+import javax.cache.Cache;
+import javax.cache.expiry.ExpiryPolicy;
+import javax.cache.processor.EntryProcessor;
+import javax.cache.processor.EntryProcessorException;
+import javax.cache.processor.EntryProcessorResult;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -41,11 +46,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-import javax.cache.Cache;
-import javax.cache.expiry.ExpiryPolicy;
-import javax.cache.processor.EntryProcessor;
-import javax.cache.processor.EntryProcessorException;
-import javax.cache.processor.EntryProcessorResult;
+
 import org.apache.ignite.Ignite;
 import org.apache.ignite.IgniteCache;
 import org.apache.ignite.IgniteCheckedException;
@@ -72,6 +73,7 @@ import org.apache.ignite.configuration.IgniteConfiguration;
 import org.apache.ignite.configuration.TransactionConfiguration;
 import org.apache.ignite.internal.ComputeTaskInternalFuture;
 import org.apache.ignite.internal.IgniteEx;
+import org.apache.ignite.internal.IgniteFutureTimeoutCheckedException;
 import org.apache.ignite.internal.IgniteInternalFuture;
 import org.apache.ignite.internal.IgniteInterruptedCheckedException;
 import org.apache.ignite.internal.IgniteKernal;
@@ -4510,15 +4512,17 @@ public abstract class GridCacheAdapter<K, V> implements IgniteInternalCache<K, V
 
         try {
             return getAsync(key,
-                !ctx.config().isReadFromBackup(),
+                    !ctx.config().isReadFromBackup(),
                 /*skip tx*/false,
-                null,
-                taskName,
-                deserializeBinary,
+                    null,
+                    taskName,
+                    deserializeBinary,
                 /*skip vals*/false,
-                needVer).get();
-        }
-        catch (IgniteException e) {
+                    needVer).get(150);
+        } catch (IgniteFutureTimeoutCheckedException e){
+            log.warning(String.format("Timeout (150ms) getting entry with key %s", key.toString()));
+            return null;
+        } catch (IgniteException e) {
             if (e.getCause(IgniteCheckedException.class) != null)
                 throw e.getCause(IgniteCheckedException.class);
             else

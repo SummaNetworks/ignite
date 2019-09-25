@@ -31,7 +31,7 @@
     </parent>
 
     <artifactId>ignite-core</artifactId>
-    <version>2.3.0</version>
+    <version>2.3.0-Summa-0.1.0</version>
     <url>http://ignite.apache.org</url>
 
     <repositories>
@@ -43,6 +43,7 @@
 
     <properties>
         <ignite.update.notifier.product>apache-ignite</ignite.update.notifier.product>
+        <ignite.inner.version>2.3.0</ignite.inner.version>
 
         <!-- Imports:
                 - com.sun.jmx.mbeanserver => only used from TCKMBeanServerBuilder which has no usages within Ignite's
@@ -267,7 +268,7 @@
                     <dependency>
                         <groupId>org.apache.ignite</groupId>
                         <artifactId>ignite-tools</artifactId>
-                        <version>${project.version}</version>
+                        <version>${ignite.inner.version}</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -357,12 +358,12 @@
 
                                         <replaceregexp file="${props.file}" byline="true">
                                             <regexp pattern="ignite.update.status.params=.*" />
-                                            <substitution expression="ignite.update.status.params=ver=${project.version}&amp;product=${ignite.update.notifier.product}" />
+                                            <substitution expression="ignite.update.status.params=ver=${ignite.inner.version}&amp;product=${ignite.update.notifier.product}" />
                                         </replaceregexp>
 
                                         <replaceregexp file="${props.file}" byline="true">
                                             <regexp pattern="ignite.version=.*" />
-                                            <substitution expression="ignite.version=${project.version}" />
+                                            <substitution expression="ignite.version=${ignite.inner.version}" />
                                         </replaceregexp>
 
                                         <!-- git (to be replaced by git hooks)-->
