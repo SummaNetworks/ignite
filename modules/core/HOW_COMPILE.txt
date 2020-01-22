@@ -1,0 +1,5 @@
+mvn clean install -DskipTests -Dmaven.javadoc.skip=true
+
+
+
+mvn deploy:deploy-file -DgroupId=org.apache.ignite -DartifactId=ignite-core -Dversion=2.3.0-Summa-0.1.0 -Dpackaging=jar -Dfile=<path-to-jar> -DpomFile=<path-to-pom> -DrepositoryId=onevox -Durl=dav:https://devel.onevox.io/repository
